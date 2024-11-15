@@ -32,7 +32,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install experta  # Install Pyke for the expert system
-        pip install tkinter  # Tkinter for the GUI
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  # Install additional dependencies from requirements.txt if it exists
 
     # Linting with flake8
