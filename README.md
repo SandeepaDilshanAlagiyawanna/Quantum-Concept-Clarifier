@@ -1,6 +1,6 @@
 # Quantum Physics Expert System
 
-This project is an expert system designed to help users explore and understand concepts in quantum computing and physics. It uses **Experta** for the inference engine and allows users to switch between **forward chaining** and **backward chaining** search algorithms, making it adaptable to both general and targeted queries. The system displays conflict sets and resolution steps to help users gain insight into the reasoning process.
+This project is an expert system designed to help users explore and understand concepts in quantum computing and physics. It uses **Experta** for the inference engine and uses **forward chaining** search algorithms, making it adaptable to both general and targeted queries. The system displays conflict sets and resolution steps to help users gain insight into the reasoning process.
 
 ## Features
 
