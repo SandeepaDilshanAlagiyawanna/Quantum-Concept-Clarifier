@@ -5,7 +5,6 @@ This project is an expert system designed to help users explore and understand c
 ## Features
 
 - **Interactive User Interface**: Built with Tkinter to enable easy interaction.
-- **Dynamic Search Algorithm Selection**: Choose between forward chaining and backward chaining based on the type of query.
 - **Conflict Set and Resolution Display**: Visualize the conflict set and selected rules for each query.
 - **Knowledge Base**: Stores rules on quantum computing and physics, with the flexibility to expand for more complex concepts.
 
