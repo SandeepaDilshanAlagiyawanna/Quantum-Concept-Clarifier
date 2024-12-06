@@ -21,7 +21,7 @@ project_root/
 ## Requirements
 
 - **Python 3.9**
-- **Pyke**: Install using `pip install experta`
+- **Experta**: Install using `pip install experta`
 - **Tkinter**: Comes pre-installed with most Python distributions.
 
 ## Setup and Installation
@@ -37,6 +37,7 @@ project_root/
 2. Install dependencies:
 
    ```bash
+   pip install tk
    pip install experta
 
    ```
@@ -49,8 +50,8 @@ project_root/
 ## Usage
 
 1. Launch the program by running `main.py`.
-2. Choose the **Search Algorithm**: Select between Forward Chaining and Backward Chaining.
-3. Enter a **Query**: Type in a question about quantum computing or physics (e.g., "quantum_superposition").
+2. Enter a **Query**: Type in a question about quantum computing or physics (e.g., "quantum_superposition").
+3. Choose the **Level**: Select between Beginner, Intermediate or Advanced(leters dont need to be correct ;-]).
 4. View Results:
    - See the system’s inference results and conflict set.
    - Observe how the conflict resolution strategy works to select rules.
@@ -62,7 +63,6 @@ To expand the system, you can add more rules to `knowledge_base.py`. Follow the 
 ## Example Queries
 
 - **Forward Chaining**: `quantum_superposition` - Explores knowledge related to quantum uncertainty.
-- **Backward Chaining**: `quantum_entanglement` - Verifies if a given relationship is classified as quantum entanglement.
 
 ## Future Improvements
 

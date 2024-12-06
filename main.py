@@ -55,6 +55,11 @@ class QuantumExpertSystemGUI:
         self.reset_button = tk.Button(self.root, text="Reset", command=self.reset_fields)
         self.reset_button.pack(side=tk.LEFT, padx=10, pady=10)
 
+        # Alternate Solutions Button (initially hidden)
+        self.alternate_button = tk.Button(self.root, text="Alternate Solution", command=self.display_alternate_solution)
+        self.alternate_button.pack(pady=10)
+        self.alternate_button.pack_forget()  # Hide initially
+
         self.exit_button = tk.Button(self.root, text="Exit", command=self.root.quit)
         self.exit_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
@@ -77,6 +82,7 @@ class QuantumExpertSystemGUI:
 
     def run_expert_system(self):
         """Run the expert system with the selected concept and level."""
+        self.output_text.delete(1.0, tk.END)
         selected_concept = self.concept_listbox.get(tk.ACTIVE)
         level_input = self.level_entry.get().lower().strip()
 
@@ -85,57 +91,81 @@ class QuantumExpertSystemGUI:
             messagebox.showerror("Selection Error", "Please select a concept from the list.")
             return
 
-        # Validate level input
-        level_matches = get_close_matches(level_input, self.available_levels, n=1, cutoff=0.5)
-        if not level_matches:
-            messagebox.showerror("Level Error", "Invalid explanation level entered.")
-            return
-        level = level_matches[0]
+        # Handle incomplete or ambiguous level input
+        if not level_input:
+            level = "beginner"
+            messagebox.showinfo("Clarification", "You did not enter a level. Defaulting to 'beginner'.")
+        else:
+            level_matches = get_close_matches(level_input, self.available_levels, n=1, cutoff=0.5)
+            if not level_matches:
+                messagebox.showerror("Level Error", "Invalid explanation level entered. Defaulting to 'beginner'.")
+                level = "beginner"
+            else:
+                level = level_matches[0]
 
         # Reset the expert system before each run
         self.engine.reset()
+        self.engine.fired_rules.clear()  # Clear fired rules
+        self.engine.explanation_output = ""  
 
-         # Clear the fired_rules list to avoid duplicate explanations
-        self.engine.fired_rules.clear()
-        self.engine.explanation_output = ""
-
-        # Declare the fact and run the expert system
-        self.engine.declare(QuantumFact(concept=selected_concept, level=level))
+        # Declare the fact and check for uncertainty
+        fact = QuantumFact(concept=selected_concept, level=level)
+        # Proceed with normal processing
+        self.engine.declare(fact)
         self.engine.run()
 
         # Clear previous output
         self.output_text.delete(1.0, tk.END)
 
         # Create a bold tag
-        self.output_text.tag_configure("bold", font=("Times New Roman", 12, "bold"))
+        self.output_text.tag_configure("bold", font=("Helvetica", 12, "bold"))
         self.output_text.tag_configure("size", font=("Helvetica", 10))
 
-        # Display the concept and level with bold formatting
+        # Output explanation and rule results
         self.output_text.insert(tk.END, "Explanation: ", "bold")
-        self.output_text.insert(tk.END, self.engine.explanation_output+"\n", "size")
+        self.output_text.insert(tk.END, self.engine.get_solution() + "\n", "size")
         self.output_text.insert(tk.END, "Concept: ", "bold")
         self.output_text.insert(tk.END, f"{selected_concept.capitalize()}\n", "size")
         self.output_text.insert(tk.END, "Level: ", "bold")
-        self.output_text.insert(tk.END, f"{level.capitalize()}\n\n", "size")
+        self.output_text.insert(tk.END, f"{level.capitalize()}\n", "size")
+        self.output_text.insert(tk.END, "Explanation Confidence: ", "bold")
+        self.output_text.insert(tk.END, f"{self.engine.current_confidence * 100:.1f}%\n", "size")
 
-        # Get conflict set and resolution from the expert system
-        conflict_set = self.engine.print_conflict_set()
         resolution = self.engine.print_resolution()
 
-        # Display conflict set and resolution with bold tags
-        self.output_text.insert(tk.END, "Conflict Resolution:\n", "bold")
-        self.output_text.insert(tk.END, conflict_set + "\n", "size")
-
-        self.output_text.insert(tk.END, "\n Rule Fired:\n", "bold")
+        self.output_text.insert(tk.END, "\nRule Fired:\n", "bold")
         self.output_text.insert(tk.END, resolution + "\n", "size")
 
+        # After output display logic:
+        self.alternate_button.pack()  # Show the Alternate Solutions button
 
     def reset_fields(self):
         """Clear all input fields and the output text box."""
-        self.concept_entry.delete(0, tk.END)
-        self.level_entry.delete(0, tk.END)
-        self.concept_listbox.delete(0, tk.END)
+        result = messagebox.askokcancel(
+        "Confirm Reset", 
+        "Are you sure you want to clear all fields and output?"
+        )
+    
+        if result:  # If OK is clicked
+            self.concept_entry.delete(0, tk.END)
+            self.level_entry.delete(0, tk.END)
+            self.concept_listbox.delete(0, tk.END)
+            self.output_text.delete(1.0, tk.END)
+            
+            # Reset alternate solutions (if needed)
+            self.alternate_solutions = ""  # Assuming you have alternate_solutions variable
+            self.alternate_button.pack_forget() 
+
+    def display_alternate_solution(self):
+        alternate_solutions = self.engine.get_alternate_solutions()
         self.output_text.delete(1.0, tk.END)
+        if alternate_solutions:
+            self.output_text.delete(1.0, tk.END)
+            self.output_text.insert(tk.END, "Alternate Solutions: ", "bold")
+            self.output_text.insert(tk.END, f"{alternate_solutions}\n", "size")
+        else:
+            messagebox.showinfo("No Alternate Solutions", "No alternate solutions available.")
+
 
 # Main execution
 if __name__ == "__main__":
